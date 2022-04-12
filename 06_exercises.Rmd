@@ -75,13 +75,32 @@ Once your repository is created, you should always open your **project** rather 
 1. Read in the fake garden harvest data. Find the data [here](https://github.com/llendway/scraping_etc/blob/main/2020_harvest.csv) and click on the `Raw` button to get a direct link to the data. After reading in the data, do one of the quick checks mentioned in the tutorial.
 
 ```{r}
+
+X2020_harvest <- read_csv("https://raw.githubusercontent.com/llendway/scraping_etc/main/2020_harvest.csv", 
+    col_types = cols(...1 = col_skip(), date = col_date(format = "%m/%d/%y"), 
+        weight = col_number()), skip = 2)
 paths_allowed(paths = "https://github.com/llendway/scraping_etc/blob/main/2020_harvest.csv")
 ```
 
   
 2. Read in this [data](https://www.kaggle.com/heeraldedhia/groceries-dataset) from the kaggle website. You will need to download the data first. Save it to your project/repo folder. Do some quick checks of the data to assure it has been read in appropriately.
 
+```{r}
+
+Groceries_dataset <- read_csv("C:/Users/JoyFP/Downloads/kaggle_gaggle/Groceries_dataset.csv", 
+    col_types = cols(Date = col_character())) %>% 
+  mutate(Date = dmy(Date))
+
+paths_allowed(paths = "https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset?resource=download") 
+
+
+```
+
 3. Create a table using `gt` with data from your project or from the `garden_harvest` data if your project data aren't ready. Use at least 3 `gt()` functions.
+
+```{r}
+
+```
 
 4. CHALLENGE (not graded): Write code to replicate the table shown below (open the .html file to see it) created from the `garden_harvest` data as best as you can. When you get to coloring the cells, I used the following line of code for the `colors` argument:
   
