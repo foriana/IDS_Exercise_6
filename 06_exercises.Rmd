@@ -37,6 +37,7 @@ library(patchwork)     # for nicely combining ggplot2 graphs
 library(gt)            # for creating nice tables
 library(rvest)         # for scraping data
 library(robotstxt)     # for checking if you can scrape data
+library(countrycode)
 theme_set(theme_minimal())
 ```
 
@@ -46,6 +47,9 @@ data("garden_harvest")
 
 #COVID-19 data from the New York Times
 covid19 <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv")
+
+#Olympic medal data
+olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv')
 
 ```
 
@@ -80,6 +84,8 @@ X2020_harvest <- read_csv("https://raw.githubusercontent.com/llendway/scraping_e
     col_types = cols(...1 = col_skip(), date = col_date(format = "%m/%d/%y"), 
         weight = col_number()), skip = 2)
 paths_allowed(paths = "https://github.com/llendway/scraping_etc/blob/main/2020_harvest.csv")
+
+
 ```
 
   
@@ -99,7 +105,23 @@ paths_allowed(paths = "https://www.kaggle.com/datasets/heeraldedhia/groceries-da
 3. Create a table using `gt` with data from your project or from the `garden_harvest` data if your project data aren't ready. Use at least 3 `gt()` functions.
 
 ```{r}
+golden_medal <- olympics %>% 
+  drop_na(medal) %>% 
+  filter(medal == "Gold") %>% 
+  group_by(noc) %>% 
+  count(medal) %>% 
+  arrange(desc(n))
+ 
+golden_medal
+ 
+  
+```
 
+```{r}
+#golden_medal %>% 
+  #gt(rowname_col = "noc") %>% 
+ # tab_row_group(label = "Shiny Boys", 
+           #     rows = n > 100) 
 
 ```
 
@@ -110,13 +132,94 @@ colors = scales::col_numeric(
       palette = paletteer::paletteer_d(
         palette = "RColorBrewer::YlGn"
       ) %>% as.character()
+      
+soup_ingredients <- garden_harvest %>% 
+  filter(vegetable == "beans" | vegetable == "carrots" | vegetable == "tomatoes") %>% 
+  mutate(soupy_bois = str_to_title(vegetable)) %>% 
+  group_by(soupy_bois, variety) %>% 
+  summarize(weight = sum(weight)) %>% 
+  mutate(weight =  weight * 0.00220462) %>% 
+  arrange(desc(weight)) %>% 
+  arrange(soupy_bois)
 ```
 
-![](garden_table.html){width=600, height=1000}
+
+```{r}
+soup_ingredients %>% 
+  gt()
+  
+  
+
+```
 
   
 5. Use `patchwork` operators and functions to combine at least two graphs using your project data or `garden_harvest` data if your project data aren't read.
+
+```{r}
+#fig.height=, fig.width=
+world <- map_data("world")
+
+
+gold_map <- golden_medal %>%
+  mutate(countryName = countrycode(noc, "genc3c", "country.name")) %>%
+  mutate(countryName = ifelse(countryName == "USA", "United States", countryName)) %>% 
+  ggplot() +
+  geom_map(map = world, 
+           aes(map_id = countryName,
+               fill = n)) +
+  scale_fill_gradient(low=cm.colors(20)[1], high=cm.colors(20)[20])+
+  expand_limits(x = world$long, y = world$lat) +
+  theme(legend.position = "bottom") +
+  theme_map()
+
+top_figure_skaters <- olympics %>% 
+   drop_na(medal) %>% 
+  filter(medal == "Gold",
+         str_detect(event, "Figure")) %>% 
+   mutate(countryName = countrycode(noc, "genc3c", "country.name")) %>%
+   mutate(countryName = ifelse(countryName == "USA", "United States", countryName)) %>% 
+  filter(countryName %in% c("Austria", "Canada", "Russia", "United States" )) %>% 
+  group_by(countryName, year, medal, sport) %>% 
+   count(medal)
+
+five_gold_skates <- top_figure_skaters %>% 
+  ggplot(aes(x = year,
+            y = n, 
+            color = countryName)) +
+  geom_line() + 
+  labs(title = "Top 5 Countries in Olympic Figure Skating Competitions",
+       subtitle = "Cumulative Gold Medal Counts",
+       y = "",
+       x = "")
+
+general_skate <- olympics %>% 
+  drop_na(medal) %>% 
+  filter(medal == "Gold",
+         str_detect(event, "Figure")) %>% 
+   mutate(countryName = countrycode(noc, "genc3c", "country.name")) %>%
+   mutate(countryName = ifelse(countryName == "USA", "United States", countryName)) %>% 
+  group_by(countryName, medal, sport) %>% 
+  drop_na(countryName) %>% 
+   count(medal)
+
+
+go_figure <- general_skate %>% 
+  ggplot(aes(x = n, 
+             y = fct_reorder(countryName, n, .desc = FALSE),
+             fill = countryName)) +
+  geom_col() +
+  labs(title = "Total Figure Skating Olympic Gold Medals",
+       y = "",
+       x = "") +
+  theme(legend.position = "none")
+
+go_figure + (gold_map/five_gold_skates) +
+  plot_annotation(title = "Olympic Gold Medals, emphasis on figure skating")
+
   
+
+```
+
 ## Webscraping exercise (also from tutorial)
 
 Use the data from the [Macalester Registrar's Fall 2017 Class Schedule](https://www.macalester.edu/registrar/schedules/2017fall/class-schedule/#crs10008) to complete all these exercises.
