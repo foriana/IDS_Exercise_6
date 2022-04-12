@@ -100,6 +100,7 @@ paths_allowed(paths = "https://www.kaggle.com/datasets/heeraldedhia/groceries-da
 
 ```{r}
 
+
 ```
 
 4. CHALLENGE (not graded): Write code to replicate the table shown below (open the .html file to see it) created from the `garden_harvest` data as best as you can. When you get to coloring the cells, I used the following line of code for the `colors` argument:
