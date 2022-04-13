@@ -237,6 +237,70 @@ Use the data from the [Macalester Registrar's Fall 2017 Class Schedule](https://
   * Description
 
 Then, put all this information into one dataset (tibble or data.frame) Do not include any extraneous information like "Instructor: ".
+
+```{r}
+fall2017 <- read.csv("https://www.macalester.edu/registrar/schedules/2017fall/class-schedule#crs10008")
+
+course_nums <-
+  fall2017 %>% 
+  html_elements(".class-schedule-course-number") %>% 
+  html_text2()
+head(course_nums)
+
+course_names <- 
+  fall2017 %>%
+  html_elements(".class-schedule-course-title") %>%
+  html_text2()
+head(course_names)
+
+course_days <- 
+  fall2017 %>%
+  html_elements("td.class-schedule-label:nth-child(3)") %>% 
+  html_text2() %>% 
+  str_sub(start = 7)
+head(course_days)
+
+course_time <-
+  fall2017 %>% 
+  html_elements(".class-schedule-label:nth-child(4)") %>% 
+  html_text2()
+head(course_time)
+
+course_room <-
+  fall2017 %>% 
+  html_elements(".class-schedule-label:nth-child(5)") %>% 
+  html_text2()
+head(course_room)
+
+course_instructor <-
+  fall2017 %>% 
+  html_elements("") %>% 
+  html_text2()
+head(course_instructor)
+
+course_seats <-
+  fall2017 %>% 
+  html_elements("") %>% 
+  html_text2()
+head(course_seats)
+
+course_gened <-
+  fall2017 %>% 
+  html_elements("") %>% 
+  html_text2()
+head(course_gened)
+
+course_desc <-
+  fall2017 %>% 
+  html_elements("") %>% 
+  html_text2()
+head(course_desc)
+
+
+#course_df <- tibble(number=course_nums, name=course_names)
+#head(course_df)
+
+```
   
 
 7. Create a graph that shows the number of sections offered per department. Hint: The department is a substring of the course number - there are `str_XXX()` functions that can help. Yes, COMP and MATH are the same department, but for this exercise you can just show the results by four letter department code, e.g., with COMP and MATH separate.
