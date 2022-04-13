@@ -274,25 +274,25 @@ head(course_room)
 
 course_instructor <-
   fall2017 %>% 
-  html_elements("") %>% 
+  html_elements(".class-schedule-label:nth-child(6)") %>% 
   html_text2()
 head(course_instructor)
 
 course_seats <-
   fall2017 %>% 
-  html_elements("") %>% 
+  html_elements(".class-schedule-label:nth-child(7) ") %>% 
   html_text2()
 head(course_seats)
 
 course_gened <-
   fall2017 %>% 
-  html_elements("") %>% 
+  html_elements("p:nth-child(2)") %>% 
   html_text2()
 head(course_gened)
 
 course_desc <-
   fall2017 %>% 
-  html_elements("") %>% 
+  html_elements(".collapsed p:nth-child(1)") %>% 
   html_text2()
 head(course_desc)
 
