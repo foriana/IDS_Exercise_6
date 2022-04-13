@@ -146,7 +146,13 @@ soup_ingredients <- garden_harvest %>%
 
 ```{r}
 soup_ingredients %>% 
-  gt()
+  gt() %>% 
+  data_color(
+    colors = scales::col_numeric(
+      palette = paletteer::paletteer_d(
+        palette = "RColorBrewer::YlGn"
+      ) %>% as.character()
+  ))
   
   
 
