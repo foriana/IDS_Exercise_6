@@ -117,22 +117,36 @@ golden_medal
   
 ```
 
-```{r}
-golden_medal %>% 
+```{r, fig.alt="This shows a table..."}
+gt_gold <- golden_medal %>% 
   ungroup(noc) %>% 
   gt(rowname_col = "noc") %>% 
   tab_row_group(label = "Shiny Boys", 
-                rows = n > 100) 
+                rows = n > 100) %>% 
+  tab_footnote(
+    footnote = "This medal count excludes countries that are no longered recognized (i.e. USSR) in 2022.",
+    locations = cells_column_labels(columns = vars(noc))) %>% 
+  data_color(columns = vars(n),
+             colors =  scales::col_numeric(palette = "viridis", 
+                                           domain = NULL),
+             alpha = .7)
+
+gt_gold
+
 
 ```
 
 4. CHALLENGE (not graded): Write code to replicate the table shown below (open the .html file to see it) created from the `garden_harvest` data as best as you can. When you get to coloring the cells, I used the following line of code for the `colors` argument:
+
+```{r}
+#colors = scales::col_numeric(
+  #    palette = paletteer::paletteer_d(
+    #    palette = "RColorBrewer::YlGn"
+    #  ) %>% as.character()
+```
   
 ```{r, eval=FALSE}
-colors = scales::col_numeric(
-      palette = paletteer::paletteer_d(
-        palette = "RColorBrewer::YlGn"
-      ) %>% as.character()
+
       
 soup_ingredients <- garden_harvest %>% 
   filter(vegetable == "beans" | vegetable == "carrots" | vegetable == "tomatoes") %>% 
@@ -141,29 +155,32 @@ soup_ingredients <- garden_harvest %>%
   summarize(weight = sum(weight)) %>% 
   mutate(weight =  weight * 0.00220462) %>% 
   arrange(desc(weight)) %>% 
-  arrange(soupy_bois)
+  arrange(soupy_bois) %>% 
+  ungroup()
+
+soup_ingredients
 ```
 
 
-```{r}
+```{r, fig.alt = "something"}
 soup_ingredients %>% 
   gt() %>% 
   data_color(
-    colors = scales::col_numeric(
-      domain = soupy_bois,
+    columns = vars(weight),
+   colors = scales::col_numeric(
       palette = paletteer::paletteer_d(
         palette = "RColorBrewer::YlGn"
-      ) %>% as.character()
-  ))
+     ) %>% as.character(), 
+     domain = NULL))
   
-  
+
 
 ```
 
   
 5. Use `patchwork` operators and functions to combine at least two graphs using your project data or `garden_harvest` data if your project data aren't read.
 
-```{r, fig.alt="Below shows three different graphs."}
+```{r, fig.height = 10, fig.width = 10, fig.alt="Below shows three different graphs about the Olympic gold medals awarded to different participating countries."}
 #fig.height=, fig.width=
 world <- map_data("world")
 
@@ -344,14 +361,24 @@ course_df %>%
   * Create a visualization of the differences across groups in lengths of course names or course descriptions. Think carefully about the visualization you should be using!
 
 
-```{r}
-course_df %>% 
+```{r, fig.alt="This is a scatterplot comparing Macalester college's Fall 2017 course title and description character lengths. Japanese and International Studies department course titlees and descriptions stick out as being longer in both title and description lengths. Math courses have the least amount of characters for both titles and descriptions.}
+long_course_df <- course_df %>% 
   mutate(name_length = str_length(name),
          desc_length = str_length(description),
          department =  str_sub(number, start = 1, end = 4)) %>%
   group_by(department) %>% 
-  count(department) %>% 
-  filter()
+  filter(n() > 10) %>% 
+  ungroup() 
+
+long_course_df %>% 
+  ggplot(aes(x = name_length, y = desc_length, color = department, size = name_length)) +
+  geom_point() +
+  labs(title = "Macalester College Fall 2017 Courses",
+       subtitle = "Course title and description character lengths",
+       y = "Length of Course Description",
+       x = "Course Name Length (point size corresponds to this") 
+
+
 ```
 
 **DID YOU REMEMBER TO UNCOMMENT THE OPTIONS AT THE TOP?**
