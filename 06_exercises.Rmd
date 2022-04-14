@@ -12,7 +12,7 @@ output:
 
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
 ```
 
 ```{r libraries}
@@ -84,7 +84,9 @@ X2020_harvest <- read_csv("https://raw.githubusercontent.com/llendway/scraping_e
     col_types = cols(...1 = col_skip(), date = col_date(format = "%m/%d/%y"), 
         weight = col_number()), skip = 2)
 paths_allowed(paths = "https://github.com/llendway/scraping_etc/blob/main/2020_harvest.csv")
+ #Lisa did not give us instructions to put comments at every step--please, no more sad faces over that :( 
 
+X2020_harvest
 
 ```
 
@@ -98,6 +100,8 @@ Groceries_dataset <- read_csv("C:/Users/JoyFP/Downloads/kaggle_gaggle/Groceries_
   mutate(Date = dmy(Date))
 
 paths_allowed(paths = "https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset?resource=download") 
+
+Groceries_dataset
 
 
 ```
@@ -117,7 +121,7 @@ golden_medal
   
 ```
 
-```{r, fig.alt="This shows a table..."}
+```{r, fig.alt="This shows a table of the cumulative gold medals different countries have won during Olympic competitions. The United States of America leads in gold medals earned with 2,638 medals as of 2016, which is more than 1,000 more gold medals than the next country, Russia."}
 gt_gold <- golden_medal %>% 
   ungroup(noc) %>% 
   gt(rowname_col = "noc") %>% 
@@ -145,7 +149,7 @@ gt_gold
     #  ) %>% as.character()
 ```
   
-```{r, eval=FALSE}
+```{r}
 
       
 soup_ingredients <- garden_harvest %>% 
@@ -162,17 +166,18 @@ soup_ingredients
 ```
 
 
-```{r, fig.alt = "something"}
+```{r, fig.alt = "This is a table of Lisa Lendway's harvested beans, carrots, tomatoes. It shows the summed weight of each variety and each different vegetable has its varieties displayed in descending order of weight."}
 soup_ingredients %>% 
   gt() %>% 
   data_color(
     columns = vars(weight),
-   colors = scales::col_numeric(
-      palette = paletteer::paletteer_d(
+ colors = scales::col_numeric(
+     palette = paletteer::paletteer_d(
         palette = "RColorBrewer::YlGn"
-     ) %>% as.character(), 
+      ) %>% as.character(),
      domain = NULL))
   
+
 
 
 ```
@@ -180,14 +185,14 @@ soup_ingredients %>%
   
 5. Use `patchwork` operators and functions to combine at least two graphs using your project data or `garden_harvest` data if your project data aren't read.
 
-```{r, fig.height = 10, fig.width = 10, fig.alt="Below shows three different graphs about the Olympic gold medals awarded to different participating countries."}
+```{r, fig.height = 13, fig.width = 15, fig.alt="Below shows three different graphs about the Olympic gold medals awarded to different participating countries. The bar chart on the left shows the amount of gold medals in figure skating earned by each country. The top right map shows the gold medal earnings around the world. The bottom right line graph shows the top five countries that win figure skating gold medals and their cumulative wins over time."}
 #fig.height=, fig.width=
 world <- map_data("world")
 
 
 gold_map <- golden_medal %>%
-  mutate(countryName = countrycode(noc, "genc3c", "country.name")) %>%
-  mutate(countryName = ifelse(countryName == "USA", "United States", countryName)) %>% 
+  mutate(countryName = countrycode(noc, "genc3c", "country.name")) %>% 
+   mutate(countryName = ifelse(countryName == "USA", "United States", countryName))%>%
   ggplot() +
   geom_map(map = world, 
            aes(map_id = countryName,
@@ -337,7 +342,7 @@ head(course_df)
 
 7. Create a graph that shows the number of sections offered per department. Hint: The department is a substring of the course number - there are `str_XXX()` functions that can help. Yes, COMP and MATH are the same department, but for this exercise you can just show the results by four letter department code, e.g., with COMP and MATH separate.
 
-```{r, fig.alt= "Graph of", fig.height= 4}
+```{r, fig.alt= "Graph of Macalester College's Fall 2017 Course Offerings and the number of courses offered by each department. Hispanic Studies offers the most courses.", fig.height= 4}
 course_df %>% 
  mutate(department =  str_sub(number, start = 1, end = 4)) %>% 
   group_by(department) %>% 
@@ -361,7 +366,7 @@ course_df %>%
   * Create a visualization of the differences across groups in lengths of course names or course descriptions. Think carefully about the visualization you should be using!
 
 
-```{r, fig.alt="This is a scatterplot comparing Macalester college's Fall 2017 course title and description character lengths. Japanese and International Studies department course titlees and descriptions stick out as being longer in both title and description lengths. Math courses have the least amount of characters for both titles and descriptions.}
+```{r, fig.alt="This is a scatterplot comparing Macalester college's Fall 2017 course title and description character lengths. Japanese and International Studies department course titlees and descriptions stick out as being longer in both title and description lengths. Math courses have the least amount of characters for both titles and descriptions."}
 long_course_df <- course_df %>% 
   mutate(name_length = str_length(name),
          desc_length = str_length(description),
