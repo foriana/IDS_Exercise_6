@@ -118,10 +118,11 @@ golden_medal
 ```
 
 ```{r}
-#golden_medal %>% 
-  #gt(rowname_col = "noc") %>% 
- # tab_row_group(label = "Shiny Boys", 
-           #     rows = n > 100) 
+golden_medal %>% 
+  ungroup(noc) %>% 
+  gt(rowname_col = "noc") %>% 
+  tab_row_group(label = "Shiny Boys", 
+                rows = n > 100) 
 
 ```
 
@@ -149,6 +150,7 @@ soup_ingredients %>%
   gt() %>% 
   data_color(
     colors = scales::col_numeric(
+      domain = soupy_bois,
       palette = paletteer::paletteer_d(
         palette = "RColorBrewer::YlGn"
       ) %>% as.character()
@@ -161,7 +163,7 @@ soup_ingredients %>%
   
 5. Use `patchwork` operators and functions to combine at least two graphs using your project data or `garden_harvest` data if your project data aren't read.
 
-```{r}
+```{r, fig.alt="Below shows three different graphs."}
 #fig.height=, fig.width=
 world <- map_data("world")
 
@@ -245,7 +247,7 @@ Use the data from the [Macalester Registrar's Fall 2017 Class Schedule](https://
 Then, put all this information into one dataset (tibble or data.frame) Do not include any extraneous information like "Instructor: ".
 
 ```{r}
-fall2017 <- read.csv("https://www.macalester.edu/registrar/schedules/2017fall/class-schedule#crs10008")
+fall2017 <- (read_html(url("https://www.macalester.edu/registrar/schedules/2017fall/class-schedule")))
 
 course_nums <-
   fall2017 %>% 
@@ -261,7 +263,7 @@ head(course_names)
 
 course_days <- 
   fall2017 %>%
-  html_elements("td.class-schedule-label:nth-child(3)") %>% 
+  html_elements("td.class-schedule-label:nth-child(3)") %>%
   html_text2() %>% 
   str_sub(start = 7)
 head(course_days)
@@ -269,42 +271,48 @@ head(course_days)
 course_time <-
   fall2017 %>% 
   html_elements(".class-schedule-label:nth-child(4)") %>% 
-  html_text2()
+  html_text2() %>% 
+  str_sub(start = 7)
 head(course_time)
 
 course_room <-
   fall2017 %>% 
   html_elements(".class-schedule-label:nth-child(5)") %>% 
-  html_text2()
+  html_text2() %>% 
+  str_sub(start = 7)
 head(course_room)
 
 course_instructor <-
   fall2017 %>% 
   html_elements(".class-schedule-label:nth-child(6)") %>% 
-  html_text2()
+  html_text2() %>% 
+  str_sub(start = 13)
 head(course_instructor)
 
 course_seats <-
   fall2017 %>% 
   html_elements(".class-schedule-label:nth-child(7) ") %>% 
-  html_text2()
+  html_text2()# %>% 
+  #str_sub(start = 7) #rutrow
 head(course_seats)
 
 course_gened <-
   fall2017 %>% 
-  html_elements("p:nth-child(2)") %>% 
-  html_text2()
+  html_elements("#content p:nth-child(2)") %>% 
+  html_text2() %>% 
+  str_sub(start = 35)
 head(course_gened)
 
 course_desc <-
   fall2017 %>% 
   html_elements(".collapsed p:nth-child(1)") %>% 
-  html_text2()
+  html_text2() %>% 
+  str_sub(start = 3)
 head(course_desc)
 
 
-#course_df <- tibble(number=course_nums, name=course_names)
-#head(course_df)
+course_df <- tibble(number=course_nums, name=course_names, days=course_days, time=course_time, room=course_room, instructor=course_instructor, seats=course_seats, general_reqs=course_gened, description=course_desc)
+head(course_df)
 
 ```
   
