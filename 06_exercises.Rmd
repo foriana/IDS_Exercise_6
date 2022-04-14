@@ -292,8 +292,9 @@ head(course_instructor)
 course_seats <-
   fall2017 %>% 
   html_elements(".class-schedule-label:nth-child(7) ") %>% 
-  html_text2()# %>% 
-  #str_sub(start = 7) #rutrow
+  html_text2() %>% 
+  str_sub(start = 14) %>% 
+  str_remove("Closed")
 head(course_seats)
 
 course_gened <-
@@ -319,6 +320,22 @@ head(course_df)
 
 7. Create a graph that shows the number of sections offered per department. Hint: The department is a substring of the course number - there are `str_XXX()` functions that can help. Yes, COMP and MATH are the same department, but for this exercise you can just show the results by four letter department code, e.g., with COMP and MATH separate.
 
+```{r, fig.alt= "Graph of", fig.height= 4}
+course_df %>% 
+ mutate(department =  str_sub(number, start = 1, end = 4)) %>% 
+  group_by(department) %>% 
+  count(department) %>% 
+  ggplot(aes(x = n, 
+             y = department,
+             color = department)) +
+  geom_col() + 
+  labs(title = "Macalester College Fall 2017 Class Offerings",
+       subtitle = "Number of courses offered by each department",
+       y = "",
+       x = "") +
+  theme(legend.position = "FALSE")
+```
+
 
 8. Analyze the typical length of course names by department. To do so, create a new data table based on your courses data table, with the following changes:
   
@@ -327,6 +344,14 @@ head(course_df)
   * Create a visualization of the differences across groups in lengths of course names or course descriptions. Think carefully about the visualization you should be using!
 
 
-  
+```{r}
+course_df %>% 
+  mutate(name_length = str_length(name),
+         desc_length = str_length(description),
+         department =  str_sub(number, start = 1, end = 4)) %>%
+  group_by(department) %>% 
+  count(department) %>% 
+  filter()
+```
 
 **DID YOU REMEMBER TO UNCOMMENT THE OPTIONS AT THE TOP?**
